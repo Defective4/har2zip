@@ -75,7 +75,7 @@ public class Main {
                         }
                         if (file.endsWith("/")) file += "index.html";
 
-                        String path = "/" + entry.urlEncodedPageref() + file;
+                        String path = entry.urlEncodedPageref() + file;
                         if (paths.contains(path)) return;
 
                         output.putNextEntry(new ZipEntry(path));
