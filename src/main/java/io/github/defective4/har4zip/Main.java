@@ -29,10 +29,12 @@ import io.github.defective4.har4zip.codec.model.PageInfo;
 
 public class Main {
     private static final Option HELP_OPTION = Option.builder("h").desc("Show this help").longOpt("help").get();
+    private static final Option KEEP_QUERY_OPTION = Option.builder("q").desc("Keep query parameters in the file names")
+            .longOpt("keep-query").get();
     private static final Options OPTIONS;
 
     static {
-        OPTIONS = new Options().addOption(HELP_OPTION);
+        OPTIONS = new Options().addOption(HELP_OPTION).addOption(KEEP_QUERY_OPTION);
     }
 
     public static void main(String[] args) throws IOException {
@@ -43,6 +45,12 @@ public class Main {
                 return;
             }
             String[] subargs = cli.getArgs();
+
+            if (subargs.length < 2) {
+                printHelp("Missing parameters");
+                System.exit(1);
+                return;
+            }
 
             try (HttpArchiveReader reader = new HttpArchiveReader(new FileReader(subargs[0]));
                     ZipOutputStream output = new ZipOutputStream(
@@ -58,7 +66,12 @@ public class Main {
                         }
                         int index = file.indexOf('?');
                         if (index > 0) {
-                            file = file.substring(0, index);
+                            if (cli.hasOption(KEEP_QUERY_OPTION)) {
+                                file = file.substring(0, index)
+                                        + URLEncoder.encode(file.substring(index + 1), StandardCharsets.UTF_8);
+                            } else {
+                                file = file.substring(0, index);
+                            }
                         }
                         if (file.endsWith("/")) file += "index.html";
 
@@ -87,6 +100,7 @@ public class Main {
 
         } catch (ParseException e) {
             printHelp(e.getMessage());
+            System.exit(1);
         }
     }
 
