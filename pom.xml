@@ -27,7 +27,20 @@
                     <buildArgs>
                         <buildArg>--enable-url-protocols=https,http</buildArg>
                     </buildArgs>
-                    <imageName>${project.name}-${project.version}-${os.name}-${os.arch}</imageName>
+                    <imageName>
+                        ${project.name}-${project.version}-${os.name}-${os.arch}</imageName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>io.github.defective4.har2zip.Main</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>

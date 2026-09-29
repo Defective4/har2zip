@@ -56,6 +56,7 @@ public class Main {
                     ZipOutputStream output = new ZipOutputStream(
                             Files.newOutputStream(Path.of(subargs[1]), StandardOpenOption.CREATE))) {
                 List<String> paths = new ArrayList<>();
+                System.err.println("Reading HAR file...");
                 HttpArchiveInfo info = reader.readHttpArchive(entry -> {
                     String file;
                     try {
@@ -87,6 +88,7 @@ public class Main {
                     }
                 });
 
+                System.err.println("Writing site summary...");
                 output.putNextEntry(new ZipEntry("/pages.json"));
                 JsonObject root = new JsonObject();
                 for (PageInfo page : info.pages()) {
@@ -96,6 +98,7 @@ public class Main {
                 output.write(
                         new GsonBuilder().setPrettyPrinting().create().toJson(root).getBytes(StandardCharsets.UTF_8));
                 output.closeEntry();
+                System.err.println("All done!");
             }
 
         } catch (ParseException e) {
