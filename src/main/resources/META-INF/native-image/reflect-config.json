@@ -1,0 +1,9 @@
+[
+{
+  "name":"com.google.gson.internal.bind.JavaTimeTypeAdapters",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"java.sql.Date"
+}
+]

@@ -1,4 +1,4 @@
-package io.github.defective4.har4zip.codec.model;
+package io.github.defective4.har2zip.codec.model;
 
 public record HttpArchiveInfo(BrowserInfo creator, BrowserInfo browser, PageInfo[] pages) {
     @Override

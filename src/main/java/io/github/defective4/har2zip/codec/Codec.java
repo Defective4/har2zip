@@ -1,4 +1,4 @@
-package io.github.defective4.har4zip.codec;
+package io.github.defective4.har2zip.codec;
 
 import java.io.IOException;
 

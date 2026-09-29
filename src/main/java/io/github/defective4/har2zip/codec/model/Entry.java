@@ -1,4 +1,4 @@
-package io.github.defective4.har4zip.codec.model;
+package io.github.defective4.har2zip.codec.model;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,8 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Base64;
 
-import io.github.defective4.har4zip.codec.Codec;
-import io.github.defective4.har4zip.codec.model.Entry.Response.Content;
+import io.github.defective4.har2zip.codec.Codec;
+import io.github.defective4.har2zip.codec.model.Entry.Response.Content;
 
 public record Entry(LocalDateTime startedDateTime, Response response, String serverIPAddress, String connection,
         String pageref, Request request) {

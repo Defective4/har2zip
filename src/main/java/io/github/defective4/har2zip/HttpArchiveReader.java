@@ -1,4 +1,4 @@
-package io.github.defective4.har4zip;
+package io.github.defective4.har2zip;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -6,10 +6,10 @@ import java.util.function.Consumer;
 
 import com.google.gson.stream.JsonReader;
 
-import io.github.defective4.har4zip.codec.model.BrowserInfo;
-import io.github.defective4.har4zip.codec.model.Entry;
-import io.github.defective4.har4zip.codec.model.HttpArchiveInfo;
-import io.github.defective4.har4zip.codec.model.PageInfo;
+import io.github.defective4.har2zip.codec.model.BrowserInfo;
+import io.github.defective4.har2zip.codec.model.Entry;
+import io.github.defective4.har2zip.codec.model.HttpArchiveInfo;
+import io.github.defective4.har2zip.codec.model.PageInfo;
 
 public class HttpArchiveReader implements AutoCloseable {
     private final JsonReader reader;

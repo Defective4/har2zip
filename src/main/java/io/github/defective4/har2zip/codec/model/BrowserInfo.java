@@ -1,6 +1,6 @@
-package io.github.defective4.har4zip.codec.model;
+package io.github.defective4.har2zip.codec.model;
 
-import io.github.defective4.har4zip.codec.Codec;
+import io.github.defective4.har2zip.codec.Codec;
 
 public record BrowserInfo(String name, String version) {
     public static final Codec<BrowserInfo> CODEC = reader -> {

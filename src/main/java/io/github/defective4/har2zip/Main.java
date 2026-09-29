@@ -1,4 +1,4 @@
-package io.github.defective4.har4zip;
+package io.github.defective4.har2zip;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,8 +24,8 @@ import org.apache.commons.cli.help.HelpFormatter;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-import io.github.defective4.har4zip.codec.model.HttpArchiveInfo;
-import io.github.defective4.har4zip.codec.model.PageInfo;
+import io.github.defective4.har2zip.codec.model.HttpArchiveInfo;
+import io.github.defective4.har2zip.codec.model.PageInfo;
 
 public class Main {
     private static final Option HELP_OPTION = Option.builder("h").desc("Show this help").longOpt("help").get();

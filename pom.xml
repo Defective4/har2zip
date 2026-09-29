@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.defective4</groupId>
     <artifactId>har2zip</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <properties>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
     </properties>
@@ -16,6 +16,18 @@
                 <version>3.16.0</version>
                 <configuration>
                     <release>21</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>1.1.14</version>
+                <configuration>
+                    <mainClass>io.github.defective4.har2zip.Main</mainClass>
+                    <buildArgs>
+                        <buildArg>--enable-url-protocols=https,http</buildArg>
+                    </buildArgs>
+                    <imageName>${project.name}-${project.version}-${os.name}-${os.arch}</imageName>
                 </configuration>
             </plugin>
         </plugins>

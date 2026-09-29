@@ -1,4 +1,4 @@
-package io.github.defective4.har4zip.codec.model;
+package io.github.defective4.har2zip.codec.model;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +8,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.defective4.har4zip.codec.Codec;
+import io.github.defective4.har2zip.codec.Codec;
 
 public record PageInfo(String id, LocalDateTime startTime, String title) {
     public static final Codec<PageInfo[]> CODEC = reader -> {
