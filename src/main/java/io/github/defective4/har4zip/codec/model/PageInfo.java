@@ -1,5 +1,7 @@
 package io.github.defective4.har4zip.codec.model;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -38,4 +40,12 @@ public record PageInfo(String id, LocalDateTime startTime, String title) {
         reader.endArray();
         return list.toArray(new PageInfo[0]);
     };
+
+    public String urlEncodedId() {
+        return URLEncoder.encode(id, StandardCharsets.UTF_8);
+    }
+
+    public String urlEncodedTitle() {
+        return URLEncoder.encode(title, StandardCharsets.UTF_8);
+    }
 }

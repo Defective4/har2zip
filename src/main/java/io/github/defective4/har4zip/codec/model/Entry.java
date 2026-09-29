@@ -2,14 +2,29 @@ package io.github.defective4.har4zip.codec.model;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Base64;
 
 import io.github.defective4.har4zip.codec.Codec;
+import io.github.defective4.har4zip.codec.model.Entry.Response.Content;
 
 public record Entry(LocalDateTime startedDateTime, Response response, String serverIPAddress, String connection,
         String pageref, Request request) {
+
+    public String urlEncodedPageref() {
+        return URLEncoder.encode(pageref(), StandardCharsets.UTF_8);
+    }
+
+    public byte[] decodeContent() {
+        Content content = response.content();
+        if (content == null || content.text() == null) return new byte[0];
+        if ("base64".equals(content.encoding())) return Base64.getDecoder().decode(content.text());
+        return content.text().getBytes(StandardCharsets.UTF_8);
+    }
 
     public record Request(URI url, String method) {
         public static Codec<Request> CODEC = reader -> {
