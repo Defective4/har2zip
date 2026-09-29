@@ -1,0 +1,113 @@
+package io.github.defective4.har4zip.codec.model;
+
+import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+import io.github.defective4.har4zip.codec.Codec;
+
+public record Entry(LocalDateTime startedDateTime, Response response, String serverIPAddress, String connection,
+        String pageref, Request request) {
+
+    public record Request(URI url, String method) {
+        public static Codec<Request> CODEC = reader -> {
+            reader.beginObject();
+
+            URI url = null;
+            String method = "GET";
+
+            while (reader.hasNext()) {
+                switch (reader.nextName()) {
+                    case "url" -> {
+                        try {
+                            url = URI.create(reader.nextString());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    case "method" -> method = reader.nextString();
+                    default -> reader.skipValue();
+                }
+            }
+            reader.endObject();
+            return new Request(url, method);
+        };
+    }
+
+    public record Response(int status, Content content) {
+        public record Content(String mimeType, long size, String encoding, String text) {
+            public static final Codec<Content> CODEC = reader -> {
+                reader.beginObject();
+
+                String mimeType = null;
+                long size = 0;
+                String text = null;
+                String encoding = null;
+
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    switch (name) {
+                        case "mimeType" -> mimeType = reader.nextString();
+                        case "size" -> size = reader.nextLong();
+                        case "text" -> text = reader.nextString();
+                        case "encoding" -> encoding = reader.nextString();
+                        default -> reader.skipValue();
+                    }
+                }
+                reader.endObject();
+                return new Content(mimeType, size, encoding, text);
+            };
+        }
+
+        public static final Codec<Response> CODEC = reader -> {
+            reader.beginObject();
+
+            int status = -1;
+            Content content = null;
+
+            while (reader.hasNext()) {
+                switch (reader.nextName()) {
+                    case "content" -> content = Content.CODEC.read(reader);
+                    case "status" -> status = reader.nextInt();
+                    default -> reader.skipValue();
+                }
+            }
+            reader.endObject();
+            return new Response(status, content);
+        };
+    }
+
+    public static final Codec<Entry> CODEC = reader -> {
+        reader.beginObject();
+
+        LocalDateTime startedDateTime = null;
+        Response response = null;
+        String serverIPAddress = null;
+        String connection = null;
+        String pageref = null;
+        Request request = null;
+
+        while (reader.hasNext()) {
+            switch (reader.nextName()) {
+                case "request" -> request = Request.CODEC.read(reader);
+                case "startedDateTime" -> {
+                    try {
+                        startedDateTime = LocalDateTime
+                                .from(DateTimeFormatter.ISO_DATE_TIME.parse(reader.nextString()));
+                    } catch (DateTimeParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                case "response" -> response = Response.CODEC.read(reader);
+                case "serverIPAddress" -> serverIPAddress = reader.nextString();
+                case "connection" -> connection = reader.nextString();
+                case "pageref" -> pageref = reader.nextString();
+                default -> reader.skipValue();
+            }
+        }
+        reader.endObject();
+        return new Entry(startedDateTime, response, serverIPAddress, connection, pageref, request);
+    };
+}
