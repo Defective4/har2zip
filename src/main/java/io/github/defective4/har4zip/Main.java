@@ -3,6 +3,8 @@ package io.github.defective4.har4zip;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,7 +51,11 @@ public class Main {
                 HttpArchiveInfo info = reader.readHttpArchive(entry -> {
                     String file;
                     try {
-                        file = entry.request().url().toURL().getFile();
+                        try {
+                            file = entry.request().url().toURL().getFile();
+                        } catch (MalformedURLException ex) {
+                            file = "/" + URLEncoder.encode(entry.request().url().toString(), StandardCharsets.UTF_8);
+                        }
                         int index = file.indexOf('?');
                         if (index > 0) {
                             file = file.substring(0, index);
