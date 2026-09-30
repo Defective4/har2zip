@@ -10,7 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -21,18 +23,24 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.help.HelpFormatter;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import io.github.defective4.har2zip.codec.model.Entry.Response;
 import io.github.defective4.har2zip.codec.model.HttpArchiveInfo;
 import io.github.defective4.har2zip.codec.model.PageInfo;
 
 public class Main {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Option HELP_OPTION = Option.builder("h").desc("Show this help").longOpt("help").get();
     private static final Options OPTIONS;
 
+    private static final Option REQ_METADATA_OPTION = Option.builder("m").desc("Write request metadata")
+            .longOpt("request-metadata").get();
+
     static {
-        OPTIONS = new Options().addOption(HELP_OPTION);
+        OPTIONS = new Options().addOption(HELP_OPTION).addOption(REQ_METADATA_OPTION);
     }
 
     public static void main(String[] args) throws IOException {
@@ -54,6 +62,10 @@ public class Main {
                     ZipOutputStream output = new ZipOutputStream(
                             Files.newOutputStream(Path.of(subargs[1]), StandardOpenOption.CREATE))) {
                 List<String> paths = new ArrayList<>();
+
+                Map<String, JsonObject> metadata = new HashMap<>();
+                boolean writeReqMetadata = cli.hasOption(REQ_METADATA_OPTION);
+
                 System.err.println("Reading HAR file...");
                 HttpArchiveInfo info = reader.readHttpArchive(entry -> {
                     String file;
@@ -83,6 +95,23 @@ public class Main {
                         output.write(entry.decodeContent());
                         output.closeEntry();
                         paths.add(path);
+
+                        if (writeReqMetadata) {
+                            JsonObject root = metadata.computeIfAbsent(entry.urlEncodedPageref(),
+                                    t -> new JsonObject());
+
+                            JsonObject req = new JsonObject();
+                            req.addProperty("path", entry.request().url().toString());
+                            JsonObject responseObj = new JsonObject();
+
+                            Response response = entry.response();
+                            responseObj.addProperty("status", response.status());
+                            responseObj.addProperty("mime", response.content().mimeType());
+
+                            req.add("response", responseObj);
+
+                            root.add(path, req);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -95,9 +124,22 @@ public class Main {
                     root.addProperty(page.id(), page.title());
                 }
 
-                output.write(
-                        new GsonBuilder().setPrettyPrinting().create().toJson(root).getBytes(StandardCharsets.UTF_8));
+                output.write(GSON.toJson(root).getBytes(StandardCharsets.UTF_8));
                 output.closeEntry();
+
+                if (writeReqMetadata) {
+                    System.err.println("Writing requests metadata...");
+                    metadata.forEach((page, obj) -> {
+                        try {
+                            output.putNextEntry(new ZipEntry("%s.json".formatted(page)));
+                            output.write(GSON.toJson(obj).getBytes(StandardCharsets.UTF_8));
+                            output.closeEntry();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            System.exit(2);
+                        }
+                    });
+                }
                 System.err.println("All done!");
             }
 
