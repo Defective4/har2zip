@@ -29,12 +29,10 @@ import io.github.defective4.har2zip.codec.model.PageInfo;
 
 public class Main {
     private static final Option HELP_OPTION = Option.builder("h").desc("Show this help").longOpt("help").get();
-    private static final Option KEEP_QUERY_OPTION = Option.builder("q").desc("Keep query parameters in the file names")
-            .longOpt("keep-query").get();
     private static final Options OPTIONS;
 
     static {
-        OPTIONS = new Options().addOption(HELP_OPTION).addOption(KEEP_QUERY_OPTION);
+        OPTIONS = new Options().addOption(HELP_OPTION);
     }
 
     public static void main(String[] args) throws IOException {
@@ -67,17 +65,19 @@ public class Main {
                         }
                         int index = file.indexOf('?');
                         if (index > 0) {
-                            if (cli.hasOption(KEEP_QUERY_OPTION)) {
-                                file = file.substring(0, index)
-                                        + URLEncoder.encode(file.substring(index + 1), StandardCharsets.UTF_8);
-                            } else {
-                                file = file.substring(0, index);
-                            }
+                            file = file.substring(0, index);
                         }
                         if (file.endsWith("/")) file += "index.html";
 
                         String path = entry.urlEncodedPageref() + file;
-                        if (paths.contains(path)) return;
+                        if (paths.contains(path)) {
+                            String np;
+                            int i = 1;
+                            do {
+                                np = path + " (%s)".formatted(i++);
+                            } while (paths.contains(np));
+                            path = np;
+                        }
 
                         output.putNextEntry(new ZipEntry(path));
                         output.write(entry.decodeContent());
