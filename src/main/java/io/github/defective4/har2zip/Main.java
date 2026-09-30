@@ -141,6 +141,7 @@ public class Main {
                     });
                 }
                 System.err.println("All done!");
+                System.err.println("Result archive saved to %s".formatted(subargs[1]));
             }
 
         } catch (ParseException e) {
